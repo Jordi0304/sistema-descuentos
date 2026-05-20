@@ -1,0 +1,7 @@
+# ─── Testing Stack — Sistema de Descuentos ───────────────────────────────────
+pytest>=9.0.3          # Runner principal
+pytest-cov             # Integración coverage.py con pytest
+pytest-bdd             # BDD / Gherkin (pytdd)
+coverage>=7.14.0       # Medición de cobertura de código
+faker>=40.15.0         # Generación de datos de prueba (Taker/Faker)
+testtools              # Matchers avanzados y utilidades de testing

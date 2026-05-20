@@ -1,0 +1,75 @@
+name: CI — Sistema de Descuentos
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  test:
+    name: "Tests + Coverage (Python ${{ matrix.python-version }})"
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.12", "3.13"]
+
+    steps:
+      # 1. Checkout del código
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+
+      # 2. Setup Python
+      - name: Configurar Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      # 3. Instalar dependencias de testing
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-test.txt
+
+      # 4. Ejecutar tests con PyTest + Coverage
+      - name: Ejecutar tests con coverage
+        run: |
+          pytest --cov=calculadora_descuentos --cov=registro_auditoria \
+                 --cov-report=term-missing \
+                 --cov-report=html:htmlcov \
+                 --cov-report=xml:coverage.xml \
+                 -v
+
+      # 5. Ejecutar tests con unittest runner (verificación cruzada)
+      - name: Ejecutar unittest runner
+        run: |
+          python -m pytest tests/test_unittest.py -v
+
+      # 6. Coverage standalone
+      - name: Generar reporte de coverage standalone
+        run: |
+          coverage report --show-missing --precision=2
+          coverage html -d htmlcov_standalone
+
+      # 7. Upload reporte HTML como artifact
+      - name: Subir reporte de cobertura HTML
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-report-py${{ matrix.python-version }}
+          path: htmlcov/
+          retention-days: 30
+
+      # 8. Upload reporte XML (para badges/integraciones)
+      - name: Subir reporte XML
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-xml-py${{ matrix.python-version }}
+          path: coverage.xml
+          retention-days: 30
+
+      # 9. Verificar cobertura mínima (95%)
+      - name: Verificar cobertura mínima
+        run: |
+          coverage report --fail-under=95

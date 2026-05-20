@@ -1,0 +1,15 @@
+[run]
+source =
+    calculadora_descuentos
+    registro_auditoria
+omit =
+    tests/*
+    */__pycache__/*
+
+[report]
+show_missing = true
+precision    = 2
+
+[html]
+directory = htmlcov
+title     = Cobertura — Sistema de Descuentos
