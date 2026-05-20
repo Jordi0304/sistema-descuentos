@@ -43,7 +43,8 @@ jobs:
       # 5. Ejecutar tests con unittest runner (verificación cruzada)
       - name: Ejecutar unittest runner
         run: |
-          python -m pytest tests/test_unittest.py -v
+          python -m unittest tests/test_unittest.py
+
 
       # 6. Coverage standalone
       - name: Generar reporte de coverage standalone
